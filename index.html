@@ -1,801 +1,306 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>致男匠的一封信</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Magic Button</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #fdfcf5;
-            background-image: 
-                linear-gradient(#e8e4d9 1px, transparent 1px),
-                linear-gradient(90deg, #e8e4d9 1px, transparent 1px);
-            background-size: 30px 30px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #4a4a4a;
-            transition: background-color 2s ease, background-image 2s ease;
-        }
-
-        body.dark-mode {
-            background-color: #0f172a;
-            background-image: none;
-        }
-
-        #envelope-stage {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-            transition: opacity 1s ease;
-        }
-
-        .envelope-wrapper {
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        .envelope-wrapper:hover {
-            transform: scale(1.02);
-        }
-
-        .envelope {
-            width: 320px;
-            height: 220px;
-            background-color: #a8e6cf;
-            position: relative;
-            border-radius: 8px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            display: flex;
-            justify-content: center;
-        }
-
-        .flap {
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-left: 160px solid transparent;
-            border-right: 160px solid transparent;
-            border-top: 120px solid #8fd3b8;
-            z-index: 5;
-            transform-origin: top;
-            transition: transform 0.6s ease, z-index 0.6s;
-        }
-
-        .envelope.open .flap {
-            transform: rotateX(180deg);
-            z-index: 1;
-        }
-
-        .pocket {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            border-left: 160px solid #bcead5;
-            border-right: 160px solid #98dbbe;
-            border-bottom: 110px solid #8fd3b8;
-            border-top: 110px solid transparent;
-            z-index: 4;
-            border-radius: 0 0 8px 8px;
-        }
-        
-        .seal {
-            position: absolute;
-            top: 100px;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            background: #c0392b;
-            border-radius: 50%;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-            z-index: 6;
-            transition: opacity 0.3s;
-            border: 2px solid #a93226;
-        }
-        .seal::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 28px;
-            height: 28px;
-            border: 1px dashed rgba(255,255,255,0.3);
-            border-radius: 50%;
-        }
-        
-        .envelope.open .seal {
-            opacity: 0;
-        }
-
-        .letter {
-            position: absolute;
-            bottom: 0;
-            left: 20px;
-            width: 280px;
-            height: 200px; 
-            background-color: #fcfbf6;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-            padding: 20px 25px;
-            box-sizing: border-box;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
-            transition: bottom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s, height 0.8s ease 0.4s;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: left;
-            border-radius: 2px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .letter::-webkit-scrollbar {
-            display: none;
-        }
-
-        .envelope.open .letter {
-            bottom: 30px; 
-            height: 480px;
-            max-height: 80vh;
-            z-index: 6;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-
-        .letter-content {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 16px;
-            color: #444;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s ease 1s, transform 1s ease 1s;
-            width: 100%;
-            line-height: 1.6;
-            padding-bottom: 20px;
-        }
-        
-        .letter-content p {
-            margin-bottom: 12px;
-            text-indent: 2em;
-        }
-        .letter-content p:first-child {
-            text-indent: 0;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 18px;
-        }
-
-        .envelope.open .letter-content {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .start-btn {
-            margin-top: 20px;
-            background: #d64541;
-            color: white;
-            border: none;
-            padding: 8px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 16px;
-            opacity: 0;
-            transition: all 0.5s ease 2s;
-            box-shadow: 0 4px 10px rgba(214, 69, 65, 0.3);
-            align-self: center;
-            display: block;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-            flex-shrink: 0;
-        }
-        .envelope.open .start-btn {
-            opacity: 1;
-        }
-        .start-btn:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(214, 69, 65, 0.4);
-        }
-
-        #canvas-stage {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 2s ease;
-            z-index: 10;
-        }
-
-        canvas {
-            display: block;
-        }
-
-        .scan-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #ff6b6b;
-            box-shadow: 0 0 15px 2px #ff6b6b, 0 0 30px 5px rgba(255, 107, 107, 0.4);
-            display: none;
-            z-index: 15;
-            pointer-events: none;
-        }
-
-        #final-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 36px;
-            color: #fff; 
-            text-shadow: 0 0 10px rgba(255, 107, 107, 0.8), 0 2px 5px rgba(0,0,0,0.5);
-            background: transparent; 
-            padding: 20px;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 2s ease;
-            z-index: 100;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-
-        @media (max-width: 600px) {
-            #final-text {
-                font-size: 24px;
-                white-space: normal;
-                width: 90%;
-            }
-            .envelope {
-                transform: scale(0.9);
-            }
-        }
-
-        #file-input-wrapper {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 200;
-            opacity: 0.3;
-        }
-        #file-input-wrapper:hover { opacity: 1; }
-        .upload-label { font-size: 12px; color: #888; cursor: pointer; }
-
-        #hint {
-            position: absolute;
-            bottom: 30px;
-            width: 100%;
-            text-align: center;
-            font-family: 'Ma Shan Zheng', cursive;
-            color: #d64541;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            font-size: 20px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 60;
-        }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #0f172a; /* slate-900 */
+        color: #f8fafc; /* slate-50 */
+        margin: 0;
+        overflow: hidden; /* Prevent scrollbars due to canvas */
+      }
+      /* Custom Animations */
+      .shimmer-bg {
+        background: linear-gradient(to right, #6366f1 0%, #ec4899 50%, #6366f1 100%);
+        background-size: 200% auto;
+        animation: shimmer 2s linear infinite;
+      }
+      @keyframes shimmer {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+      }
+      .fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .spin {
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <!-- Canvas Background Layer -->
+    <canvas id="bgCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
 
-    <!-- 背景音乐：请在这里修改 src 属性为你本地音乐的路径 -->
-    <!-- 例如：src="love_story.mp3" -->
-    <audio id="bgm" loop>
-        <source src="music.mp3" type="audio/mpeg">
-        您的浏览器不支持音频播放。
-    </audio>
+    <!-- Main UI Content -->
+    <div id="root" class="min-h-screen flex flex-col items-center justify-center p-6 relative z-10 select-none">
+      
+      <header class="mb-12 text-center">
+        <div class="inline-flex items-center justify-center p-3 mb-4 rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 shadow-xl">
+            <i data-lucide="sparkles" class="w-6 h-6 text-amber-400 mr-2"></i>
+            <h1 class="text-xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-amber-200 to-yellow-400">
+                Daily Inspiration
+            </h1>
+        </div>
+        <p class="text-slate-400 max-w-md mx-auto text-sm sm:text-base font-light">
+          Tap the button below to summon a burst of wisdom powered by Gemini AI.
+        </p>
+      </header>
 
-    <!-- 阶段一：信封 -->
-    <div id="envelope-stage">
-        <div class="envelope-wrapper" id="envelope-wrapper">
-            <div class="envelope" id="envelope">
-                <div class="flap"></div>
-                <div class="pocket"></div>
-                <div class="seal"></div> 
-                <div class="letter">
-                    <div class="letter-content">
-                        <p>亲爱的周：</p>
-                        <p>一直有很多话想对你说，却总不知该从何开口。</p>
-                        <p>作为一个理工生，我或许不擅长用华丽的辞藻去编织动人的情话。所以我借用小王子的一句独白，来表达我内心最真实的声音：</p>
-                        <p style="color: #d64541; font-weight: bold; margin: 15px 0;">“也許世界上也有五千朵和你一模一樣的花，但只有你是我獨一無二的玫瑰。”</p>
-                        <p>下面，是我为你准备的一点小魔法。虽然我们此刻天各一方，但我希望能用我擅长的方式——代码与逻辑，跨越距离，让我们在屏幕的光影中相聚。</p>
-                        <button class="start-btn" id="btn-reveal">开启魔法</button>
-                    </div>
-                </div>
+      <main class="flex flex-col items-center w-full max-w-lg gap-8">
+        <!-- Magic Button Container -->
+        <div class="relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <button id="inspireBtn" class="
+                relative px-12 py-5 rounded-full 
+                bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 
+                text-white font-bold text-lg tracking-wider uppercase
+                shadow-[0_0_20px_rgba(79,70,229,0.5)] 
+                transition-all duration-300 ease-out transform
+                hover:scale-105 hover:shadow-[0_0_40px_rgba(168,85,247,0.6)] hover:-translate-y-1
+                active:scale-95 active:translate-y-0 active:shadow-inner
+                disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
+                border border-white/10
+                overflow-hidden
+                group flex items-center justify-center gap-2 cursor-pointer
+            ">
+              <!-- Glossy overlay -->
+              <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+              
+              <!-- Button Content -->
+              <span id="btnText" class="relative z-10 flex items-center gap-2">Inspire Me</span>
+              
+              <!-- Hover ripple effect hint -->
+              <div class="absolute inset-0 rounded-full opacity-0 group-hover:opacity-20 bg-white transition-opacity duration-300 pointer-events-none"></div>
+            </button>
+        </div>
+
+        <!-- Result Content Area -->
+        <div id="contentArea" class="w-full min-h-[200px] flex items-center justify-center transition-all duration-500 ease-in-out">
+            <div class="text-slate-600 italic text-sm animate-pulse">
+                Waiting for inspiration...
             </div>
         </div>
+      </main>
+
+      <footer class="absolute bottom-6 text-slate-600 text-xs">
+        Powered by Google Gemini 3 Flash
+      </footer>
     </div>
 
-    <!-- 阶段二：粒子与画布 -->
-    <div id="canvas-stage">
-        <canvas id="canvas"></canvas>
-        <div class="scan-overlay" id="laser-line"></div>
-        <div id="hint">点击爱心</div>
-        <div id="final-text">男匠，无论多少个秋冬我都想和你一起走过。</div>
-    </div>
+    <!-- Application Logic -->
+    <script type="module">
+      import { GoogleGenAI } from "https://esm.sh/@google/genai@0.2.1";
 
-    <div id="file-input-wrapper">
-        <label for="imageUpload" class="upload-label">更换图片</label>
-        <input type="file" id="imageUpload" accept="image/*" style="display:none">
-    </div>
+      // ------------------------------------------------------------------
+      // CONFIGURATION: API KEY
+      // ------------------------------------------------------------------
+      // To make this work on GitHub Pages, you must manually set your API key here.
+      // NOTE: In a real production app, never expose API keys in client-side code.
+      // This shim mimics the process.env behavior from the previous Node.js setup.
+      window.process = {
+        env: {
+          API_KEY: 'YOUR_API_KEY_HERE' // <--- REPLACE THIS WITH YOUR GEMINI API KEY
+        }
+      };
 
-    <script>
-        const envelopeStage = document.getElementById('envelope-stage');
-        const envelope = document.getElementById('envelope');
-        const envelopeWrapper = document.getElementById('envelope-wrapper');
-        const btnReveal = document.getElementById('btn-reveal');
-        const bgm = document.getElementById('bgm'); // 获取音频元素
+      // ------------------------------------------------------------------
+      // CANVAS BACKGROUND (Visuals)
+      // ------------------------------------------------------------------
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width, height;
+      let blobs = [];
+
+      class Blob {
+        constructor() {
+          this.init();
+        }
+
+        init() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.4; // Slow, ambient movement
+          this.vy = (Math.random() - 0.5) * 0.4;
+          this.radius = Math.min(width, height) * (0.3 + Math.random() * 0.3);
+          // Purple and Indigo hues
+          this.color = Math.random() > 0.5 
+            ? 'rgba(147, 51, 234, 0.15)' // Purple
+            : 'rgba(79, 70, 229, 0.15)'; // Indigo
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // Bounce off edges (mostly keeps them in view) or wrap around
+          if (this.x < -this.radius) this.x = width + this.radius;
+          if (this.x > width + this.radius) this.x = -this.radius;
+          if (this.y < -this.radius) this.y = height + this.radius;
+          if (this.y > height + this.radius) this.y = -this.radius;
+        }
+
+        draw(ctx) {
+          ctx.beginPath();
+          const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+          gradient.addColorStop(0, this.color);
+          gradient.addColorStop(1, 'rgba(0,0,0,0)');
+          
+          ctx.fillStyle = gradient;
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
         
-        const canvasStage = document.getElementById('canvas-stage');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const laserLine = document.getElementById('laser-line');
-        const finalText = document.getElementById('final-text');
-        const hintText = document.getElementById('hint');
-        const fileInput = document.getElementById('imageUpload');
+        blobs = [];
+        // Create 3 large ambient blobs
+        for(let i = 0; i < 3; i++) {
+          blobs.push(new Blob());
+        }
+      }
 
-        const STATE = {
-            WAIT_ENVELOPE: 0,
-            ENVELOPE_OPEN: 1,
-            INIT_HEART: 2,
-            SCATTERING: 3,
-            ASSEMBLING: 4,
-            ASSEMBLED: 5,
-            SCANNING: 6,
-            FULL_IMAGE: 7
-        };
-        let currentState = STATE.WAIT_ENVELOPE;
-
-        let particles = [];
-        let fireworks = []; 
-        let width, height;
-        let imgObj = null;
-        let animationId;
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        // 'screen' blend mode gives a nice glowing overlap effect
+        ctx.globalCompositeOperation = 'screen';
         
-        let imgX, imgY, imgW, imgH;
-        let scanProgress = 0;
-        let heartScale = 15;
-        const GAP = 3;
+        blobs.forEach(blob => {
+          blob.update();
+          blob.draw(ctx);
+        });
+        
+        ctx.globalCompositeOperation = 'source-over';
+        requestAnimationFrame(animate);
+      }
 
-        // --- 信封交互 ---
-        envelopeWrapper.addEventListener('click', () => {
-            if (currentState === STATE.WAIT_ENVELOPE) {
-                envelope.classList.add('open');
-                currentState = STATE.ENVELOPE_OPEN;
+      window.addEventListener('resize', resize);
+      resize();
+      animate();
 
-                // 尝试播放音乐 (浏览器通常要求有交互才能播放音频，点击信封正好满足)
-                bgm.play().catch(error => {
-                    console.log("自动播放被阻止，等待下一次交互: ", error);
-                });
-            }
+      // ------------------------------------------------------------------
+      // APP LOGIC (Interactions & API)
+      // ------------------------------------------------------------------
+      const inspireBtn = document.getElementById('inspireBtn');
+      const btnText = document.getElementById('btnText');
+      const contentArea = document.getElementById('contentArea');
+
+      // Initialize icons on load
+      lucide.createIcons();
+
+      async function generateInspiration() {
+        const apiKey = window.process.env.API_KEY;
+        
+        // Basic check to see if user updated the key
+        if (!apiKey || apiKey === 'YOUR_API_KEY_HERE') {
+            throw new Error("API_KEY_MISSING");
+        }
+
+        const ai = new GoogleGenAI({ apiKey: apiKey });
+        
+        const response = await ai.models.generateContent({
+          model: 'gemini-3-flash-preview',
+          contents: "Generate a short, unique, and deeply inspiring quote or a fascinating philosophical fact. Keep it under 30 words. Do not include quotes from famous people, generate something original.",
+          config: {
+            thinkingConfig: { thinkingBudget: 0 },
+            temperature: 1.2,
+          }
         });
 
-        btnReveal.addEventListener('click', (e) => {
-            e.stopPropagation();
+        return response.text;
+      }
+
+      // UI State: Loading
+      function setUiLoading() {
+        inspireBtn.disabled = true;
+        btnText.innerHTML = `
+            <i data-lucide="loader-2" class="w-5 h-5 spin"></i>
+            <span>Summoning...</span>
+        `;
+        lucide.createIcons();
+        
+        contentArea.innerHTML = `
+          <div class="w-full h-32 flex flex-col items-center justify-center gap-2">
+            <div class="w-full max-w-[200px] h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full shimmer-bg w-[50%]"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      // UI State: Success
+      function setUiSuccess(text) {
+        inspireBtn.disabled = false;
+        btnText.textContent = "Inspire Me";
+        
+        contentArea.innerHTML = `
+          <div class="relative w-full bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-8 shadow-2xl fade-in-up transform transition-all hover:bg-slate-800/60">
+            <i data-lucide="quote" class="absolute top-4 left-4 w-8 h-8 text-indigo-500/30 -rotate-12"></i>
+            <div class="relative z-10 text-center">
+              <p class="text-xl md:text-2xl font-light leading-relaxed text-slate-100 font-serif">
+                "${text}"
+              </p>
+            </div>
+            <i data-lucide="quote" class="absolute bottom-4 right-4 w-8 h-8 text-purple-500/30 rotate-12"></i>
+            <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-white/5 to-transparent rounded-tr-2xl pointer-events-none"></div>
+          </div>
+        `;
+        lucide.createIcons();
+      }
+
+      // UI State: Error
+      function setUiError(message) {
+        inspireBtn.disabled = false;
+        btnText.textContent = "Inspire Me";
+        
+        contentArea.innerHTML = `
+            <div class="text-red-400 bg-red-900/20 px-6 py-4 rounded-xl border border-red-500/30 text-center fade-in-up">
+                <p>${message}</p>
+            </div>
+        `;
+      }
+
+      // Button Click Handler
+      inspireBtn.addEventListener('click', async () => {
+        setUiLoading();
+        try {
+            const result = await generateInspiration();
+            setUiSuccess(result);
+        } catch (err) {
+            console.error(err);
+            let msg = "The magic faded momentarily. Please try again.";
             
-            // 如果之前播放失败，这里再次尝试播放
-            if (bgm.paused) {
-                bgm.play();
+            if (err.message === "API_KEY_MISSING") {
+                msg = "Missing API Key. Please open index.html and replace 'YOUR_API_KEY_HERE' with your actual key.";
+            } else if (err.message.includes("403")) {
+                msg = "Invalid API Key. Please check your settings.";
             }
-
-            document.body.classList.add('dark-mode');
             
-            envelopeStage.style.opacity = 0;
-            setTimeout(() => {
-                envelopeStage.style.display = 'none';
-                canvasStage.style.opacity = 1;
-                canvasStage.style.pointerEvents = 'auto';
-                
-                initCanvasStage();
-            }, 1000);
-        });
-
-        // --- 烟花类 ---
-        class Firework {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = height;
-                this.targetY = height * 0.15 + Math.random() * (height * 0.3); 
-                
-                this.gravity = 0.04;
-                const distance = height - this.targetY;
-                const speedFactor = Math.sqrt(2 * this.gravity * distance);
-                
-                this.angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.1; 
-                this.vx = Math.cos(this.angle) * 1; 
-                this.vy = speedFactor + Math.random() * 1; 
-                
-                const hue = Math.floor(Math.random() * 360);
-                this.hue = hue;
-                this.color = `hsl(${hue}, 90%, 60%)`;
-                
-                this.particles = [];
-                this.trail = []; 
-                this.exploded = false;
-                this.dead = false;
-            }
-
-            update() {
-                if (!this.exploded) {
-                    this.trail.push({x: this.x, y: this.y});
-                    if (this.trail.length > 25) this.trail.shift(); 
-
-                    this.x += this.vx;
-                    this.y -= this.vy;
-                    this.vy -= this.gravity; 
-                    
-                    if (this.vy <= 0.1 || this.y <= this.targetY) {
-                        this.explode();
-                    }
-                } else {
-                    for (let i = this.particles.length - 1; i >= 0; i--) {
-                        const p = this.particles[i];
-                        p.vx *= p.friction; 
-                        p.vy *= p.friction;
-                        p.x += p.vx;
-                        p.y += p.vy;
-                        p.vy += p.gravity; 
-                        p.alpha -= p.decay;
-                        
-                        if (Math.random() < 0.1) { 
-                            p.alpha = Math.min(p.alpha + 0.2, 1);
-                        }
-                        if (p.alpha <= 0) this.particles.splice(i, 1);
-                    }
-                    if (this.particles.length === 0) this.dead = true;
-                }
-            }
-
-            explode() {
-                this.exploded = true;
-                this.trail = []; 
-                const particleCount = 150 + Math.random() * 80;
-                const secondColorHue = (this.hue + 180) % 360; 
-                const hasSecondColor = Math.random() < 0.6;
-
-                for (let i = 0; i < particleCount; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 7 + 2; 
-                    let pColor;
-                    if (hasSecondColor && Math.random() < 0.4) {
-                         pColor = `hsl(${secondColorHue}, 90%, 70%)`;
-                    } else {
-                         pColor = `hsl(${this.hue}, 90%, ${50 + Math.random()*40}%)`; 
-                    }
-                    this.particles.push({
-                        x: this.x,
-                        y: this.y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        color: pColor,
-                        alpha: 1,
-                        size: Math.random() * 2 + 1.5, 
-                        friction: 0.96, 
-                        gravity: 0.04,  
-                        decay: 0.004 + Math.random() * 0.006 
-                    });
-                }
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.globalCompositeOperation = 'lighter';
-                
-                if (!this.exploded) {
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = this.color;
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2); 
-                    ctx.fill();
-
-                    ctx.shadowBlur = 0;
-                    for (let i = 0; i < this.trail.length; i++) {
-                        const point = this.trail[i];
-                        const progress = i / this.trail.length;
-                        ctx.globalAlpha = progress * 0.4; 
-                        ctx.fillStyle = this.color;
-                        ctx.beginPath();
-                        ctx.arc(point.x, point.y, 1 + progress * 1.5, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                } else {
-                    for (const p of this.particles) {
-                        ctx.shadowBlur = 20; 
-                        ctx.shadowColor = p.color;
-                        ctx.globalAlpha = p.alpha;
-                        ctx.fillStyle = p.color;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-                ctx.restore();
-            }
+            setUiError(msg);
         }
-
-        // --- 粒子类 ---
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            heartScale = Math.min(width, height) / 35;
-
-            if (imgObj) {
-                calculateImagePosition();
-                if (currentState === STATE.INIT_HEART) {
-                    calculateHeartTargets();
-                } else if (currentState >= STATE.ASSEMBLING) {
-                    particles.forEach(p => p.updateTarget());
-                }
-            }
-        }
-        window.addEventListener('resize', resize);
-
-        class Particle {
-            constructor(x, y, color, relX, relY) {
-                this.x = x; 
-                this.y = y;
-                this.tx = x; 
-                this.ty = y;
-                this.relX = relX;
-                this.relY = relY;
-                this.color = color;
-                this.size = Math.random() * 2 + 1;
-                this.vx = 0;
-                this.vy = 0;
-                this.friction = 0.92;
-                this.ease = 0.08; 
-                this.phase = Math.random() * Math.PI * 2;
-                this.floatSpeed = 0.001 + Math.random() * 0.002;
-            }
-
-            updateTarget() {
-                this.tx = imgX + this.relX * imgW;
-                this.ty = imgY + this.relY * imgH;
-            }
-
-            update(time) {
-                if (currentState === STATE.INIT_HEART) {
-                    const floatX = Math.sin(time * this.floatSpeed + this.phase) * 10;
-                    const floatY = Math.cos(time * this.floatSpeed + this.phase) * 10;
-                    
-                    const targetX = this.tx + floatX;
-                    const targetY = this.ty + floatY;
-                    
-                    this.x += (targetX - this.x) * 0.1;
-                    this.y += (targetY - this.y) * 0.1;
-                }
-                else if (currentState === STATE.SCATTERING) {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    if (this.x < 0 || this.x > width) this.vx *= -1;
-                    if (this.y < 0 || this.y > height) this.vy *= -1;
-                } 
-                else {
-                    const dx = this.tx - this.x;
-                    const dy = this.ty - this.y;
-                    this.x += dx * this.ease;
-                    this.y += dy * this.ease;
-                    
-                    if (currentState === STATE.ASSEMBLED && Math.abs(dx) < 1) {
-                        this.x += (Math.random() - 0.5) * 0.5;
-                        this.y += (Math.random() - 0.5) * 0.5;
-                    }
-                }
-            }
-
-            draw(ctx) {
-                if (currentState === STATE.SCANNING) {
-                     const scanY = imgY + (scanProgress * imgH);
-                     if (this.y < scanY) return;
-                }
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.size, this.size);
-            }
-        }
-
-        function calculateHeartTargets() {
-            const centerX = width / 2;
-            const centerY = height / 2; 
-
-            particles.forEach(p => {
-                let inside = false;
-                let hx, hy;
-                let attempts = 0;
-                while (!inside && attempts < 20) {
-                    const t = Math.random() * Math.PI * 2;
-                    const r = Math.sqrt(Math.random());
-                    const x = 16 * Math.pow(Math.sin(t), 3);
-                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-                    hx = x * r * heartScale;
-                    hy = y * r * heartScale;
-                    inside = true;
-                }
-                p.tx = centerX + hx;
-                p.ty = centerY + hy;
-                if (currentState === STATE.INIT_HEART && Math.abs(p.x - width/2) < 1) {
-                    p.x = p.tx;
-                    p.y = p.ty;
-                }
-            });
-        }
-
-        function calculateImagePosition() {
-            if (!imgObj) return;
-            const maxWidth = width * 0.8;
-            const maxHeight = height * 0.7;
-            const imgRatio = imgObj.width / imgObj.height;
-            const screenRatio = maxWidth / maxHeight;
-            if (imgRatio > screenRatio) {
-                imgW = maxWidth;
-                imgH = maxWidth / imgRatio;
-            } else {
-                imgH = maxHeight;
-                imgW = maxHeight * imgRatio;
-            }
-            imgX = (width - imgW) / 2;
-            imgY = (height - imgH) / 2;
-        }
-
-        function initParticles(image) {
-            particles = [];
-            const tmpCanvas = document.createElement('canvas');
-            const tmpCtx = tmpCanvas.getContext('2d');
-            let readWidth = image.width;
-            let readHeight = image.height;
-            if (readWidth > 800) { 
-                const scale = 800 / readWidth;
-                readWidth = 800;
-                readHeight = image.height * scale;
-            }
-            tmpCanvas.width = readWidth;
-            tmpCanvas.height = readHeight;
-            tmpCtx.drawImage(image, 0, 0, readWidth, readHeight);
-            const data = tmpCtx.getImageData(0, 0, readWidth, readHeight).data;
-
-            for (let y = 0; y < readHeight; y += GAP) {
-                for (let x = 0; x < readWidth; x += GAP) {
-                    const i = (y * readWidth + x) * 4;
-                    if (data[i+3] > 128) {
-                        const color = `rgb(${data[i]},${data[i+1]},${data[i+2]})`;
-                        particles.push(new Particle(width/2, height/2, color, x/readWidth, y/readHeight));
-                    }
-                }
-            }
-        }
-
-        function initCanvasStage() {
-            resize();
-            currentState = STATE.INIT_HEART;
-            calculateHeartTargets();
-            hintText.style.opacity = 1; 
-            animate();
-        }
-
-        function animate() {
-            const time = Date.now();
-            ctx.clearRect(0, 0, width, height);
-
-            if ((currentState === STATE.SCANNING || currentState === STATE.FULL_IMAGE) && imgObj) {
-                ctx.save();
-                if (currentState === STATE.SCANNING) {
-                    const scanPixelY = imgY + (scanProgress * imgH);
-                    ctx.beginPath();
-                    ctx.rect(imgX, imgY, imgW, scanPixelY - imgY);
-                    ctx.clip();
-                    ctx.drawImage(imgObj, imgX, imgY, imgW, imgH);
-                    
-                    laserLine.style.display = 'block';
-                    laserLine.style.top = `${scanPixelY}px`;
-                    laserLine.style.left = `${imgX}px`;
-                    laserLine.style.width = `${imgW}px`;
-                } else {
-                    ctx.drawImage(imgObj, imgX, imgY, imgW, imgH);
-                    laserLine.style.display = 'none';
-                }
-                ctx.restore();
-            } else {
-                laserLine.style.display = 'none';
-            }
-
-            if (currentState !== STATE.FULL_IMAGE) {
-                particles.forEach(p => {
-                    p.update(time);
-                    p.draw(ctx);
-                });
-            }
-
-            if (currentState === STATE.FULL_IMAGE) {
-                if (Math.random() < 0.012) { 
-                    fireworks.push(new Firework());
-                }
-                for (let i = fireworks.length - 1; i >= 0; i--) {
-                    const fw = fireworks[i];
-                    fw.update();
-                    fw.draw(ctx);
-                    if (fw.dead) fireworks.splice(i, 1);
-                }
-            }
-
-            if (currentState === STATE.SCANNING) {
-                scanProgress += 0.008;
-                if (scanProgress >= 1.0) {
-                    currentState = STATE.FULL_IMAGE;
-                    finalText.style.opacity = 1;
-                    hintText.style.opacity = 0;
-                }
-            }
-            animationId = requestAnimationFrame(animate);
-        }
-
-        canvas.addEventListener('click', () => {
-            if (currentState === STATE.INIT_HEART) {
-                currentState = STATE.SCATTERING;
-                hintText.style.opacity = 0;
-
-                particles.forEach(p => {
-                    const angle = Math.random() * Math.PI * 2;
-                    const force = Math.random() * 15 + 5;
-                    p.vx = Math.cos(angle) * force;
-                    p.vy = Math.sin(angle) * force;
-                });
-
-                setTimeout(() => {
-                    currentState = STATE.ASSEMBLING;
-                    calculateImagePosition();
-                    particles.forEach(p => p.updateTarget());
-                    setTimeout(() => {
-                        currentState = STATE.ASSEMBLED;
-                        hintText.innerText = "点击图片还原记忆";
-                        hintText.style.opacity = 1;
-                    }, 2500);
-                }, 1500);
-            }
-            else if (currentState === STATE.ASSEMBLED) {
-                currentState = STATE.SCANNING;
-                scanProgress = 0;
-                hintText.style.opacity = 0;
-            }
-        });
-
-        function loadImage(src) {
-            imgObj = new Image();
-            imgObj.crossOrigin = "Anonymous";
-            imgObj.onload = () => {
-                resize();
-                initParticles(imgObj);
-            };
-            imgObj.src = src;
-        }
-
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (evt) => loadImage(evt.target.result);
-                reader.readAsDataURL(file);
-            }
-        });
-
-        loadImage('unnamed.jpg');
+      });
     </script>
-</body>
+  </body>
 </html>
