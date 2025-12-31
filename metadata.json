@@ -1,0 +1,5 @@
+{
+  "name": "The Magic Button",
+  "description": "A streamlined, aesthetically pleasing single-page application featuring a high-interaction button that leverages Google's Gemini API to deliver instant inspiration.",
+  "requestFramePermissions": []
+}
